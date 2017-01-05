@@ -1,6 +1,7 @@
 var path = require('path');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 var dirApp = path.join(__dirname, 'app');
 var dirAssets = path.join(__dirname, 'assets');
@@ -44,7 +45,9 @@ module.exports = {
             template: path.join(__dirname, 'index.ejs'),
             filename: 'index.html',
             inject: true
-        })
+        }),
+
+        new ExtractTextPlugin('main.[hash].css')
     ],
     module: {
         loaders: [
@@ -59,14 +62,26 @@ module.exports = {
                 }
             },
 
+            // CSS
+            {
+                test: /\.css$/,
+                loader: ExtractTextPlugin.extract(
+                    'style',
+                    'css'
+                )
+            },
+
+            // SASS
+            {
+                test: /\.scss$/,
+                loader: ExtractTextPlugin.extract(
+                    'style',
+                    'css?sourceMap!sass?sourceMap'
+                )
+            },
+
             // EJS
             { test: /\.ejs$/, loader: 'ejs' },
-
-            // STYLES
-            { test: /\.css$/, loader: 'style!css' },
-
-            // CSS / SASS
-            { test: /\.scss/, loader: 'style!css?sourceMap!sass?sourceMap' },
 
             // Image loader
             { test: /\.(jpe*g|png|gif)$/, loader: 'file?name=assets/images/[hash].[ext]' }
