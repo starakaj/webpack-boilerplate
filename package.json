@@ -6,14 +6,17 @@
   "license": "MIT",
   "homepage": "https://github.com/cvgellhorn/webpack-boilerplate",
   "scripts": {
+    "postinstall": "npm run build",
     "dev": "NODE_ENV=dev webpack-dev-server --inline --progress --config webpack.config.dev.js",
-    "build": "NODE_ENV=production webpack -p --config webpack.config.build.js"
+    "build": "NODE_ENV=production webpack -p --config webpack.config.build.js",
+    "start": "node server/index.js"
   },
   "repository": {
     "type": "git",
     "url": "https://cvgellhorn@github.com/cvgellhorn/webpack-boilerplate.git"
   },
   "dependencies": {
+    "express": "^4.14.0",
     "jquery": "^3.1.1",
     "lodash": "^4.17.4"
   },
