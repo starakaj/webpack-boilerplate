@@ -1,11 +1,20 @@
-var path = require('path');
-var webpack = require('webpack');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var dirApp = path.join(__dirname, 'app');
-var dirAssets = path.join(__dirname, 'assets');
+// Is the current build a development build
+const IS_DEV = (process.env.NODE_ENV === 'dev');
 
+const dirNode = 'node_modules';
+const dirApp = path.join(__dirname, 'app');
+const dirAssets = path.join(__dirname, 'assets');
+
+const appHtmlTitle = 'Webpack Boilerplate';
+
+/**
+ * Webpack Configuration
+ */
 module.exports = {
     entry: {
         vendor: [
@@ -15,18 +24,16 @@ module.exports = {
         bundle: path.join(dirApp, 'index')
     },
     resolve: {
-        modulesDirectories: [
-            'node_modules'
-        ],
-        root: [
+        modules: [
+            dirNode,
             dirApp,
             dirAssets
         ]
     },
     plugins: [
-        new webpack.optimize.DedupePlugin(),
-
-        new webpack.optimize.OccurenceOrderPlugin(true),
+        new webpack.DefinePlugin({
+            IS_DEV: IS_DEV
+        }),
 
         new webpack.ProvidePlugin({
             // jQuery
@@ -39,55 +46,92 @@ module.exports = {
             '_': 'lodash'
         }),
 
-        new webpack.optimize.CommonsChunkPlugin('vendor', '[name].[hash].js'),
-
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'index.ejs'),
-            filename: 'index.html',
-            inject: true
+            title: appHtmlTitle
         }),
 
         new ExtractTextPlugin('main.[hash].css')
     ],
     module: {
-        loaders: [
-            // Babel loader
+        rules: [
+            // BABEL
             {
                 test: /\.js$/,
+                loader: 'babel-loader',
                 exclude: /(node_modules)/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015'],
+                options: {
                     compact: true
                 }
             },
 
-            // CSS
+            // STYLES
             {
                 test: /\.css$/,
-                loader: ExtractTextPlugin.extract(
-                    'style',
-                    'css'
-                )
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: IS_DEV
+                        }
+                    },
+                ]
             },
+
+            // CSS / SASS
+            {
+                test: /\.scss/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: IS_DEV
+                        }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: IS_DEV,
+                            includePaths: [dirAssets]
+                        }
+                    }
+                ]
+            },
+
+            // CSS
+            // {
+            //     test: /\.css$/,
+            //     loader: ExtractTextPlugin.extract(
+            //         'style',
+            //         'css'
+            //     )
+            // },
 
             // SASS
-            {
-                test: /\.scss$/,
-                loader: ExtractTextPlugin.extract(
-                    'style',
-                    'css?sourceMap!sass?sourceMap'
-                )
-            },
+            // {
+            //     test: /\.scss$/,
+            //     loader: ExtractTextPlugin.extract(
+            //         'style',
+            //         'css?sourceMap!sass?sourceMap'
+            //     )
+            // },
 
             // EJS
-            { test: /\.ejs$/, loader: 'ejs' },
+            {
+                test: /\.ejs$/,
+                loader: 'ejs-loader'
+            },
 
-            // Image loader
-            { test: /\.(jpe*g|png|gif)$/, loader: 'file?name=assets/images/[hash].[ext]' }
+            // IMAGES
+            {
+                test: /\.(jpe*g|png|gif)$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[path][name].[ext]'
+                }
+            }
         ]
-    },
-    sassLoader: {
-        includePaths: [dirAssets]
     }
 };
