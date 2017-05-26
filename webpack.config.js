@@ -68,55 +68,41 @@ module.exports = {
             // STYLES
             {
                 test: /\.css$/,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            sourceMap: IS_DEV
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                sourceMap: IS_DEV
+                            }
                         }
-                    },
-                ]
+                    ]
+                })
             },
 
             // CSS / SASS
             {
                 test: /\.scss/,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            sourceMap: IS_DEV
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                sourceMap: IS_DEV
+                            }
+                        },
+                        {
+                            loader: 'sass-loader',
+                            options: {
+                                sourceMap: IS_DEV,
+                                includePaths: [dirAssets]
+                            }
                         }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: IS_DEV,
-                            includePaths: [dirAssets]
-                        }
-                    }
-                ]
+                    ]
+                })
             },
-
-            // CSS
-            // {
-            //     test: /\.css$/,
-            //     loader: ExtractTextPlugin.extract(
-            //         'style',
-            //         'css'
-            //     )
-            // },
-
-            // SASS
-            // {
-            //     test: /\.scss$/,
-            //     loader: ExtractTextPlugin.extract(
-            //         'style',
-            //         'css?sourceMap!sass?sourceMap'
-            //     )
-            // },
 
             // EJS
             {
